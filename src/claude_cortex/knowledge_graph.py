@@ -24,7 +24,12 @@ DEFAULT_KG_PATH = os.path.expanduser("~/.cortex/knowledge_graph.db")
 class KnowledgeGraph:
     def __init__(self, db_path: str = None):
         self.db_path = db_path or DEFAULT_KG_PATH
-        Path(self.db_path).parent.mkdir(parents=True, exist_ok=True)
+        db_dir = Path(self.db_path).parent
+        db_dir.mkdir(parents=True, exist_ok=True)
+        try:
+            db_dir.chmod(0o700)
+        except (OSError, NotImplementedError):
+            pass
         self._connection = None
         self._lock = threading.Lock()
         self._init_db()
@@ -138,7 +143,11 @@ class KnowledgeGraph:
         if direction in ("in", "both"):
             queries.append(("object", eid))
 
+        # Whitelist column names to prevent SQL injection
+        ALLOWED_COLS = {"subject", "object"}
         for col, val in queries:
+            if col not in ALLOWED_COLS:
+                continue
             rows = conn.execute(
                 f"""SELECT t.*,
                        s.name as subject_name, o.name as object_name

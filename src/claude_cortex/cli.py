@@ -263,6 +263,11 @@ def _register_plugin(plugin_root: Path):
         return
 
     try:
+        # Backup before modifying
+        import shutil
+        backup = plugins_file.with_suffix(".json.bak")
+        shutil.copy2(plugins_file, backup)
+
         data = json.loads(plugins_file.read_text())
         plugins = data.get("plugins", {})
 

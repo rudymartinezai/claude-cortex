@@ -17,6 +17,12 @@ def _fix_blob_seq_ids(store_path: str):
     if not os.path.isfile(db_path):
         return
     try:
+        # Backup DB before migration
+        import shutil
+        backup_path = db_path + ".pre_migration_bak"
+        if not os.path.isfile(backup_path):
+            shutil.copy2(db_path, backup_path)
+
         with sqlite3.connect(db_path) as conn:
             for table in ("embeddings", "max_seq_id"):
                 try:
@@ -75,6 +81,10 @@ class ChromaBackend:
         create: bool = True,
     ) -> ChromaCollection:
         os.makedirs(store_path, exist_ok=True)
+        try:
+            os.chmod(store_path, 0o700)
+        except (OSError, NotImplementedError):
+            pass
         _fix_blob_seq_ids(store_path)
         client = chromadb.PersistentClient(path=store_path)
         if create:

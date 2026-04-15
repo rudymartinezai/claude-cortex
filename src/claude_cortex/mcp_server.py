@@ -131,6 +131,10 @@ def cortex_add_trace(content: str, region: str, cluster: str, source: str = "") 
 
 def cortex_delete_trace(trace_id: str) -> dict:
     """Remove a trace by ID. Irreversible."""
+    # Validate trace_id format (should be hex string, max 64 chars)
+    import re
+    if not re.match(r'^[a-f0-9]{1,64}$', trace_id):
+        raise ValueError(f"Invalid trace_id format: {trace_id}")
     _wal_log("delete_trace", {"trace_id": trace_id})
     col = get_collection(_config.cortex_path, _config.collection_name)
     col.delete(ids=[trace_id])

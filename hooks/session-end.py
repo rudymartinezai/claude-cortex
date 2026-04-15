@@ -151,15 +151,32 @@ def _observation_to_content(obs: dict) -> str:
         tool = obs.get("tool", "unknown")
         inp = obs.get("input_summary", "")
         out = obs.get("output_summary", "")
-        return f"[Tool: {tool}] {inp}\n{out}"
-
+        content = f"[Tool: {tool}] {inp}\n{out}"
     elif obs_type == "user_message":
-        return f"[User] {obs.get('content', '')}"
-
+        content = f"[User] {obs.get('content', '')}"
     elif obs_type == "assistant_message":
-        return f"[Assistant] {obs.get('content', '')}"
+        content = f"[Assistant] {obs.get('content', '')}"
+    else:
+        content = str(obs)[:500]
 
-    return str(obs)[:500]
+    # Scrub potential secrets before indexing
+    return _scrub_secrets(content)
+
+
+def _scrub_secrets(text: str) -> str:
+    """Remove potential API keys, tokens, and passwords from text."""
+    import re
+    # Common secret patterns
+    patterns = [
+        (r'(?i)(api[_-]?key|token|secret|password|passwd|pwd)\s*[:=]\s*["\']?([A-Za-z0-9_\-]{20,})["\']?', r'\1=***REDACTED***'),
+        (r'(?i)(Bearer\s+)[A-Za-z0-9_\-\.]{20,}', r'\1***REDACTED***'),
+        (r'sk-[A-Za-z0-9]{20,}', '***REDACTED_API_KEY***'),
+        (r'ghp_[A-Za-z0-9]{36}', '***REDACTED_GH_TOKEN***'),
+        (r'xoxb-[A-Za-z0-9\-]{20,}', '***REDACTED_SLACK_TOKEN***'),
+    ]
+    for pattern, replacement in patterns:
+        text = re.sub(pattern, replacement, text)
+    return text
 
 
 def _classify(content: str, cluster_keywords: dict) -> str:

@@ -62,6 +62,10 @@ def main():
 
     # Write to session capture file
     CAPTURES_DIR.mkdir(parents=True, exist_ok=True)
+    try:
+        CAPTURES_DIR.chmod(0o700)
+    except (OSError, NotImplementedError):
+        pass
     capture_file = CAPTURES_DIR / f"{session_id}.jsonl"
 
     try:
