@@ -22,6 +22,22 @@ cortex install
 
 That's it. Restart Claude Code and you have persistent memory.
 
+### What `cortex install` does
+
+1. **Registers as a Claude Code plugin** — hooks into SessionStart, PostToolUse, SessionEnd, and PreCompact
+2. **Registers an MCP server** — exposes 10 tools (search, KG, status) to your AI agent
+
+### From source (development)
+
+```bash
+git clone https://github.com/rudymartinezai/claude-cortex.git
+cd claude-cortex
+python3 -m venv .venv && source .venv/bin/activate
+pip install -e .
+cortex init
+cortex install
+```
+
 ## Quick start
 
 ```bash
@@ -62,21 +78,32 @@ cortex kg timeline "project-x"
 
 Your AI wakes up with ~170 tokens of context. Not 10,000. Just enough to know who you are and what matters.
 
-### Auto-Capture Pipeline
+### Auto-Capture Pipeline (Claude Code Hooks)
+
+Four hooks fire automatically during every Claude Code session:
 
 ```
-Session starts
-  → Hook fires
-  → Load L0 + L1 from cortex
+SessionStart
+  → session-start.py fires
+  → Loads L0 + L1 from cortex → injected as system message
+  → AI starts with relevant context, zero manual effort
 
-You talk, AI works
-  → Tool uses captured
-  → Decisions captured
-  → User messages captured
+PostToolUse (Write | Edit | Bash)
+  → post-tool-use.py fires
+  → Captures operation to ~/.cortex/captures/{session}.jsonl
+  → Fast: local file write only, no ChromaDB during session
 
-Session ends
-  → Classify all observations by topic
-  → Vectorize and store as traces
+PreCompact
+  → pre-compact.py fires
+  → Injects cortex context before context window compression
+  → Critical state survives compaction
+
+SessionEnd
+  → session-end.py fires
+  → Reads all captured observations
+  → Classifies each by topic (keyword matching against clusters)
+  → Vectorizes and stores as traces in ChromaDB
+  → Builds session summary trace
   → Update knowledge graph
   → Ready for next session
 ```

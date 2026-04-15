@@ -11,3 +11,5 @@ build/
 *.db
 .venv/
 venv/
+.cortex-env/
+*.jsonl

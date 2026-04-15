@@ -167,21 +167,120 @@ clusters:
 
 
 def cmd_install(args):
-    """Wire claude-cortex into Claude Code as MCP server."""
+    """Wire claude-cortex into Claude Code as plugin + MCP server."""
     import subprocess
+    import shutil
     python_path = sys.executable
 
+    # Find the plugin root (where hooks/ and .claude-plugin/ live)
+    plugin_root = _find_plugin_root()
+
+    print(f"\n{'=' * 60}")
+    print(f"  claude-cortex Install")
+    print(f"{'=' * 60}\n")
+
+    success_count = 0
+    total_steps = 2
+
+    # Step 1: Register as Claude Code plugin (hooks for auto-capture)
+    if plugin_root:
+        plugin_cache = Path(os.path.expanduser("~/.claude/plugins/cache/local/claude-cortex/0.1.0"))
+        plugin_cache.parent.mkdir(parents=True, exist_ok=True)
+
+        # Symlink instead of copy — updates flow through automatically
+        if plugin_cache.exists() or plugin_cache.is_symlink():
+            if plugin_cache.is_symlink():
+                plugin_cache.unlink()
+            else:
+                shutil.rmtree(plugin_cache)
+
+        try:
+            plugin_cache.symlink_to(plugin_root)
+            print(f"  [1/{total_steps}] ✓ Plugin linked: {plugin_cache} → {plugin_root}")
+            print(f"           Hooks: SessionStart, PostToolUse, SessionEnd, PreCompact")
+
+            # Register in installed_plugins.json
+            _register_plugin(plugin_root)
+            success_count += 1
+        except Exception as e:
+            print(f"  [1/{total_steps}] ✗ Plugin link failed: {e}")
+            print(f"           Manual: claude --plugin-dir {plugin_root}")
+    else:
+        print(f"  [1/{total_steps}] ⚠ Plugin root not found (hooks won't auto-capture)")
+        print(f"           Install from source: pip install -e /path/to/claude-cortex")
+
+    # Step 2: Register MCP server (10 search/KG tools)
     result = subprocess.run(
         ["claude", "mcp", "add", "cortex", "--", python_path, "-m", "claude_cortex.mcp_server"],
         capture_output=True, text=True,
     )
 
     if result.returncode == 0:
-        print(f"  ✓ claude-cortex wired into Claude Code")
-        print(f"  MCP server: {python_path} -m claude_cortex.mcp_server")
-        print(f"\n  Restart Claude Code to activate.")
+        print(f"  [2/{total_steps}] ✓ MCP server registered: {python_path} -m claude_cortex.mcp_server")
+        print(f"           Tools: cortex_search, cortex_status, cortex_kg_query, +7 more")
+        success_count += 1
     else:
-        print(f"  Error: {result.stderr}")
+        print(f"  [2/{total_steps}] ✗ MCP registration failed: {result.stderr.strip()}")
+
+    print(f"\n{'─' * 60}")
+    if success_count == total_steps:
+        print(f"  ✓ Full install complete ({success_count}/{total_steps})")
+        print(f"\n  Auto-capture: ON (every session indexed automatically)")
+        print(f"  MCP tools:    ON (search, KG, status available)")
+    elif success_count > 0:
+        print(f"  ⚠ Partial install ({success_count}/{total_steps})")
+    else:
+        print(f"  ✗ Install failed")
+
+    print(f"\n  Restart Claude Code to activate.")
+    print(f"{'=' * 60}")
+
+
+def _find_plugin_root() -> Path | None:
+    """Find the claude-cortex plugin root directory."""
+    # Check if we're running from the repo (development install)
+    # __file__ = src/claude_cortex/cli.py → .parent×3 = repo root
+    candidates = [
+        Path(__file__).parent.parent.parent,  # src/claude_cortex/cli.py -> src/ -> repo root
+        Path(os.path.expanduser("~/.cortex/plugin")),  # alternative install location
+    ]
+
+    for candidate in candidates:
+        if (candidate / ".claude-plugin" / "plugin.json").exists():
+            return candidate.resolve()
+        if (candidate / "hooks" / "hooks.json").exists():
+            return candidate.resolve()
+
+    return None
+
+
+def _register_plugin(plugin_root: Path):
+    """Add claude-cortex to installed_plugins.json."""
+    from datetime import datetime
+
+    plugins_file = Path(os.path.expanduser("~/.claude/plugins/installed_plugins.json"))
+    if not plugins_file.exists():
+        return
+
+    try:
+        data = json.loads(plugins_file.read_text())
+        plugins = data.get("plugins", {})
+
+        now = datetime.now().isoformat() + "Z"
+        plugins["claude-cortex@local"] = [
+            {
+                "scope": "user",
+                "installPath": str(plugin_root),
+                "version": "0.1.0",
+                "installedAt": now,
+                "lastUpdated": now,
+            }
+        ]
+
+        data["plugins"] = plugins
+        plugins_file.write_text(json.dumps(data, indent=2))
+    except Exception:
+        pass  # Non-fatal — plugin will still work via symlink
 
 
 def cmd_kg(args):
