@@ -1,5 +1,10 @@
 # claude-cortex
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](https://opensource.org/licenses/MIT)
+[![Python 3.9+](https://img.shields.io/badge/python-3.9+-blue.svg)](https://www.python.org/downloads/)
+[![CI](https://github.com/rudymartinezai/claude-cortex/actions/workflows/ci.yml/badge.svg)](https://github.com/rudymartinezai/claude-cortex/actions)
+[![ChromaDB](https://img.shields.io/badge/vector--db-ChromaDB-orange.svg)](https://www.trychroma.com/)
+
 **Auto-capture + structured semantic recall for AI coding agents.**
 
 The memory system Claude Code should have had. One install. Zero config. Your AI remembers everything.
