@@ -2,7 +2,7 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](https://opensource.org/licenses/MIT)
 [![Python 3.9+](https://img.shields.io/badge/python-3.9+-blue.svg)](https://www.python.org/downloads/)
-[![CI](https://github.com/rudymartinezai/claude-cortex/actions/workflows/ci.yml/badge.svg)](https://github.com/rudymartinezai/claude-cortex/actions)
+[![CI](https://github.com/codebloodedai/claude-cortex/actions/workflows/ci.yml/badge.svg)](https://github.com/codebloodedai/claude-cortex/actions)
 [![ChromaDB](https://img.shields.io/badge/vector--db-ChromaDB-orange.svg)](https://www.trychroma.com/)
 
 **Auto-capture + structured semantic recall for AI coding agents.**
@@ -35,7 +35,7 @@ That's it. Restart Claude Code and you have persistent memory.
 ### From source (development)
 
 ```bash
-git clone https://github.com/rudymartinezai/claude-cortex.git
+git clone https://github.com/codebloodedai/claude-cortex.git
 cd claude-cortex
 python3 -m venv .venv && source .venv/bin/activate
 pip install -e .

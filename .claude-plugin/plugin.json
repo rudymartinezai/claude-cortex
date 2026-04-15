@@ -4,10 +4,10 @@
   "description": "Auto-capture + structured semantic recall for AI coding agents",
   "author": {
     "name": "CodeBloodedAI (Rudy Martinez)",
-    "url": "https://github.com/codedbloodedai"
+    "url": "https://github.com/codebloodedai"
   },
-  "homepage": "https://github.com/rudymartinezai/claude-cortex",
-  "repository": "https://github.com/rudymartinezai/claude-cortex",
+  "homepage": "https://github.com/codebloodedai/claude-cortex",
+  "repository": "https://github.com/codebloodedai/claude-cortex",
   "license": "MIT",
   "keywords": ["memory", "recall", "auto-capture", "knowledge-graph", "semantic-search"]
 }

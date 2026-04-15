@@ -26,8 +26,8 @@ dependencies = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/codedbloodedai/claude-cortex"
-Repository = "https://github.com/codedbloodedai/claude-cortex"
+Homepage = "https://github.com/codebloodedai/claude-cortex"
+Repository = "https://github.com/codebloodedai/claude-cortex"
 
 [project.scripts]
 cortex = "claude_cortex.cli:main"

@@ -5,7 +5,7 @@ Thanks for your interest in contributing. This project is young and contribution
 ## Quick start
 
 ```bash
-git clone https://github.com/rudymartinezai/claude-cortex.git
+git clone https://github.com/codebloodedai/claude-cortex.git
 cd claude-cortex
 python3 -m venv .venv && source .venv/bin/activate
 pip install -e ".[dev]"
@@ -39,7 +39,7 @@ cortex init
 
 ## Security
 
-If you find a security vulnerability, please report it privately via [GitHub Security Advisories](https://github.com/rudymartinezai/claude-cortex/security/advisories) instead of opening a public issue.
+If you find a security vulnerability, please report it privately via [GitHub Security Advisories](https://github.com/codebloodedai/claude-cortex/security/advisories) instead of opening a public issue.
 
 ## License
 

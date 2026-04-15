@@ -10,7 +10,7 @@
 
 **Do not open a public issue for security vulnerabilities.**
 
-Please report security issues via [GitHub Security Advisories](https://github.com/rudymartinezai/claude-cortex/security/advisories).
+Please report security issues via [GitHub Security Advisories](https://github.com/codebloodedai/claude-cortex/security/advisories).
 
 You can expect:
 - Acknowledgment within 48 hours
