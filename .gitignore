@@ -1,0 +1,13 @@
+__pycache__/
+*.pyc
+*.egg-info/
+dist/
+build/
+.eggs/
+*.egg
+~/.cortex/
+.cortex/
+*.sqlite3
+*.db
+.venv/
+venv/

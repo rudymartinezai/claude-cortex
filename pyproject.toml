@@ -1,0 +1,36 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "claude-cortex"
+version = "0.1.0"
+description = "Auto-capture + structured semantic recall for AI coding agents. The memory system Claude Code should have had."
+readme = "README.md"
+license = "MIT"
+requires-python = ">=3.9"
+authors = [
+    { name = "Rudy Martinez", email = "rudy.man.martinez@gmail.com" },
+]
+keywords = ["ai", "memory", "claude", "mcp", "semantic-search", "knowledge-graph"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Topic :: Software Development :: Libraries",
+]
+dependencies = [
+    "chromadb>=1.0.0",
+    "pyyaml>=6.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/codedbloodedai/claude-cortex"
+Repository = "https://github.com/codedbloodedai/claude-cortex"
+
+[project.scripts]
+cortex = "claude_cortex.cli:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/claude_cortex"]
